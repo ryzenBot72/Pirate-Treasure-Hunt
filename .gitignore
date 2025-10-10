@@ -1,0 +1,30 @@
+### C & C++ ###
+# Object files (compiled code)
+*.o
+*.obj
+*.elf
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+
+# Libraries (static, shared, and precompiled)
+*.lib
+*.a
+*.dll
+*.so
+*.dylib
+
+# Debug/Build Files
+*.dSYM/
+*.pdb
+*.idb
+
+### Other Files ###
+# Temporary files
+*~
+.fuse_hidden*
+
