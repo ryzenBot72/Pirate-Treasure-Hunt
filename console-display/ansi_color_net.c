@@ -3,18 +3,21 @@
 #include <stdio.h>
 
 void color_print(int n, int mode) { // mode = 0(light text); mode = 1(dark text);
+     printf("\x1b[48;5;%dm", n);     // \x1b[48;5;<n>m; sets the text background as per the value of n;
+    
+    if(mode == 0) {
+        printf("\x1b[38;5;253m");
+    }
     if(mode == 1) {
         printf("\x1b[38;5;238m");   // for dark(238) text color;
     }
-    printf("\x1b[48;5;%dm", n);     // \x1b[48;5;<n>m; sets the text background as per the value of n;
                                     
-    printf("%4d", n);               //printing the actual number associated to the color; '4' in %4d sets the character field width to 4 units, basically sets the width of the color box;
+    printf("%4d", n);               //printing the actual number associated to the color; '5' in %5d sets the character field width to 5 units, basically sets the width of the color box;
 
 //    printf("%4c", ' ');           //if you don't want the numbers to be printed for each color, then uncomment this command and comment-out the above one;
 
     printf("\x1b[0m");              // reseting all the attributes to default value; (!important)
 }
-
 
 
 int main() {
