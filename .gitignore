@@ -2,10 +2,13 @@
 *.log
 
 # Temporary files
-*.tmp
 *~
-
+*.tmp
+*.swp
 *.bak
+
+# VS Code specific files
+.vscode/
 
 # Environment files (containing secrets, API keys, credentials)
 .env
@@ -23,3 +26,4 @@
 *.exe
 
 tags
+game

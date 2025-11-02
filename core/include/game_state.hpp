@@ -18,6 +18,12 @@ typedef struct PlayerState {
     vector<int> visited;
     float energy;
     float deplete_rate;
+
+    bool top_allowed;
+    bool bottom_allowed;
+    bool right_allowed;
+    bool left_allowed;
+
 } PlayerState;
 
 typedef struct DisplayState{
@@ -31,12 +37,18 @@ typedef struct TextState{
 } TextState;
 
 typedef struct GameState {
+    int isActive;                   //is the game session active(0 : close game session; 1: show closing confirmation window; 2 : game session is running)
     vector<IslandState> i_state;    //island visibility, status of items and challeges(how many challenges completed/ items received/ how many are left) per island
-    PlayerState p_state;            //current position, islands visited, alive/dead, energy, energy_deplete_rate(depends upon display state + abilities), progress(optional) \
-                                      (note, pixel to pixel jump speed will be the same for each display state, just the step size would vary, thus varing the energy consumption)
+    PlayerState p_state;            /*current position, islands visited, alive/dead, energy, energy_deplete_rate(depends upon display state + abilities), progress(optional)
+                                      (note, pixel to pixel jump speed will be the same for each display state, just the step size would vary, thus varing the energy consumption) */
     DisplayState d_state;           //sea_mode, island_mode, challenge_mode, view_island/view_sea(birds-eye view of the island/sea)
     TextState t_state;              //enable/disable text menu, what to display in the text area. 
 } GameState;
+
+
+void init_game_state(GameState *g_state);
+
+int state_manager(char ch, GameState *g_state);
 
 #endif
 
