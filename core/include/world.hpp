@@ -2,6 +2,7 @@
 #define WORLD_HPP
 
 //As each world will contain a unique randomly generated map, seperating the different worlds makes sense
+#include <memory>
 #include <vector>
 #include "game_session.hpp"
 #include "map.hpp"
@@ -13,5 +14,7 @@ typedef struct World {
     vector<GameSession> game;   //each game session is associated to a unique player
     WorldMap map;               //common to all the players of the current world
 } World;
+
+int main_loop(unique_ptr<World>& w);
 
 #endif

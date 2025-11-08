@@ -3,8 +3,12 @@
 
 #include "world.hpp"
 
-void printMatrix(int (*matrix)[X_MAX], int *pos);
+#define DISPLAY_X 30
+#define DISPLAY_Y 30
+
+void printMatrix(int rows, int cols, const vector<vector<int>>& matrix, GameState *g_state);
 void printDisplay(WorldMap *map, GameState *g_state);
-void render(World *w);
+void printText(GameSession* game);
+void render(unique_ptr<World>& w);
 
 #endif

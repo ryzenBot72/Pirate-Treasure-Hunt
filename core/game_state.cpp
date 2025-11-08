@@ -1,4 +1,5 @@
 #include "game_state.hpp"
+#include "render.hpp"
 #include <stdio.h>
 
 //Initialise the GameState struct
@@ -6,22 +7,28 @@ void init_game_state(GameState *g_state) {
     PlayerState *p = &(g_state->p_state);
     DisplayState *d = &(g_state->d_state);
 
-    p->pos[0] = 0;
-    p->pos[1] = 0;
-    p->isAlive = true;
-    p->top_allowed = true;
-    p->bottom_allowed = true;
-    p->right_allowed = true;
-    p->left_allowed = true;
-
     d->mode = 1;
     d->show_map = false;
+    for(int i = 0; i < 3; i++) {
+        d->disp[i][0] = 0;
+        d->disp[i][1] = 0;
+    }
+
+    for(int i = 0; i < 3; i++) {
+        p->pos[i][0] = 0;
+        p->pos[i][1] = 0;
+    }
+    p->isAlive = true;
+    p->x_max = DISPLAY_X;
+    p->y_max = DISPLAY_Y;
 
     g_state->isActive = 2;
 }
 
 //changes the elements of the GameState struct as per the player key input
 int state_manager(char ch, GameState *g_state) {
+    DisplayState *d = &(g_state->d_state);
+    PlayerState *p = &(g_state->p_state);
 
     //For arrow keys
     if(ch == 27) {  // Escape character
@@ -29,21 +36,22 @@ int state_manager(char ch, GameState *g_state) {
         if(ch == '[') {
             ch = getchar();  // Get the actual arrow key code
 
-            int* x = &(g_state->p_state.pos[0]);
-            int* y = &(g_state->p_state.pos[1]);
-            PlayerState* p = &(g_state->p_state);
+            int* x = &(p->pos[d->mode][0]);
+            int* y = &(p->pos[d->mode][1]);
+            
+            
             switch (ch) {
                 case 'A':   //Up Arrow
-                    if(p->top_allowed) (*y)--;
+                    if(*y > 0) (*y)--;
                     break;
                 case 'B':   //Down Arrow
-                    if(p->bottom_allowed) (*y)++;
+                    if(*y < p->y_max) (*y)++;
                     break;
                 case 'C':   //Right Arrow
-                    if(p->right_allowed) (*x)++;
+                    if(*x < p->x_max) (*x)++;
                     break;
                 case 'D':   //Left Arrow
-                    if(p->left_allowed) (*x)--;
+                    if(*x > 0) (*x)--;
                     break;
             }
         }
@@ -52,7 +60,17 @@ int state_manager(char ch, GameState *g_state) {
         switch (ch) {
             case 'm':   //toggling show_map
             case 'M': {
-                          g_state->d_state.show_map = !(g_state->d_state.show_map);
+                          //g_state->d_state.show_map = !(g_state->d_state.show_map);
+                          if(g_state->d_state.mode == 1) {
+                                g_state->d_state.mode = 0;
+                          }
+                          else if (g_state->d_state.mode == 2){
+                                g_state->d_state.mode = 1;
+                          }
+                          else {
+                                g_state->d_state.mode = 2;
+                          }
+
                           break;
                       }
 
@@ -69,6 +87,15 @@ int state_manager(char ch, GameState *g_state) {
                           break;
                       }
         }
+    }
+
+    if(d->mode == 1) {
+        p->x_max = SEA_OVERVIEW_X - 1;
+        p->y_max = SEA_OVERVIEW_Y - 1;
+    }
+    else if(d->mode == 2) {
+        p->x_max = ISLAND_X - 1;
+        p->y_max = ISLAND_Y - 1;
     }
 
     return 0;

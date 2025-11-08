@@ -14,21 +14,19 @@ typedef struct IslandState {
 
 typedef struct PlayerState {
     bool isAlive;
-    int pos[2];         //(x,y) coordinates of the player
+    int pos[3][2];      //(x,y) coordinates of the player
     vector<int> visited;
     float energy;
     float deplete_rate;
-
-    bool top_allowed;
-    bool bottom_allowed;
-    bool right_allowed;
-    bool left_allowed;
+    int x_max;          //x-direction limit of the player movement(x boundary of the map)
+    int y_max;          //y-direction limit of the player movement(y boundary of the map)
 
 } PlayerState;
 
 typedef struct DisplayState{
     int mode;           //ex.(0 - blank, 1 - sea, 2 - island, 3 - challenge)
     bool show_map;      //(0 - normal game screen, 1 - overview of the map based on the display mode)
+    int disp[3][2];     //stores the position of the origin point(0,0) of the display matrix w.r.t. to the map
 } DisplayState;
 
 typedef struct TextState{
