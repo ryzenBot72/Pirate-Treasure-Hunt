@@ -1,8 +1,16 @@
 #include <cstdlib>
 #include <ctime>
+#include <math.h>
 #include "map.hpp"
 #include "utils.hpp"
 
+
+//selects a number(tile color) from an array randomly
+int random_tile(int type) {
+    int tile[2][5] = {{39, 33, 39, 33, 39}, {240, 76, 220, 112, 112}};
+
+    return tile[type - 1][(int)sqrt(rand() % 25)];
+}
 
 //randomly generate 'n' islands
 void generate_islands(vector<Island>& island, int n) {
@@ -25,7 +33,8 @@ void init_matrix(WorldMap *map) {
     for(int i = 0; i < SEA_OVERVIEW_Y; i++) {
         //srand(time(0));
         for(int j = 0; j < SEA_OVERVIEW_X; j++) {
-            map->sea_overview[i][j] = 21;
+            //map->sea_overview[i][j] = 21;
+            map->sea_overview[i][j] = random_tile(1);
         }
     }
 
@@ -35,7 +44,7 @@ void init_matrix(WorldMap *map) {
         y = map->island[i].coords[1];
 
         //mat[x][y] = 220; //Yellow
-        map->sea_overview[y][x] = 34; //Green
+        map->sea_overview[y][x] = 40; //Green
     }
 /*-------------------------------------*/
 
@@ -44,7 +53,8 @@ void init_matrix(WorldMap *map) {
     //land
     for(int i = 0; i < ISLAND_Y; i++) {
         for(int j = 0; j < ISLAND_X; j++) {
-            map->island_normal[i][j] = 88;
+            //map->island_normal[i][j] = 88;
+            map->island_normal[i][j] = random_tile(2);
         }
     }
 /*-------------------------------------*/
