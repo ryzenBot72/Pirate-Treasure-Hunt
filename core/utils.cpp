@@ -8,10 +8,10 @@
 
 //headers and global variables
 #include <stdio.h>
+#include "render.hpp"
 
 #if defined(_WIN32)
     #include <windows.h>
-    #include "render.hpp"
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
     DWORD original_mode;
 #else
@@ -41,8 +41,8 @@ void set_raw_input_mode() {
         tcsetattr(STDIN_FILENO, TCSANOW, &newt); // Set the new settings;
     #endif
 
-    setvbuf(stdout, NULL, _IOLBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y))); //actual size of each box(pixel) is 18 bytes, but added 2 more bytes for safety and for the newline characters at the end of each line
-    setvbuf(stderr, NULL, _IOLBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y)));
+    setvbuf(stdout, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y))); //actual size of each box(pixel) is 18 bytes, but added 2 more bytes for safety and for the newline characters at the end of each line
+    setvbuf(stderr, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y)));
 }
 
 
