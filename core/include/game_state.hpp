@@ -46,7 +46,7 @@ typedef struct GameState {
 
 void init_game_state(GameState *g_state);
 
-int state_manager(char ch, GameState *g_state);
+int state_manager(int ch, GameState *g_state);
 
 #endif
 

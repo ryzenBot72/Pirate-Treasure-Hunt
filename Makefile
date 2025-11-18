@@ -1,6 +1,3 @@
-# Output executable name
-EXE = game
-
 # Source and include directories
 SRC = core
 INCLUDE_DIR = $(SRC)/include
@@ -13,6 +10,19 @@ IFLAGS = -I$(INCLUDE_DIR)
 # Source files
 SOURCES = $(wildcard $(SRC)/*.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)
+
+
+ifeq ($(OS),Windows_NT)
+    RM = del /Q
+    EXE = game
+	CLEAN_CMD = for /f "delims=" %%f in ('dir /s /b core\*.o') do del /q "%%f"
+
+else
+    RM = rm -f
+    EXE = game
+	CLEAN_CMD = $(RM) $(SRC)/*.o $(EXE)
+endif
+
 
 # Default target
 all: $(EXE)
@@ -27,7 +37,7 @@ $(SRC)/%.o: $(SRC)/%.cpp
 
 # Clean up
 clean:
-	rm -f $(SRC)/*.o $(EXE)
+	-$(CLEAN_CMD)
 
 # Phony targets
 .PHONY: all clean

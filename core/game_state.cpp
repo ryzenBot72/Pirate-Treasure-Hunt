@@ -26,9 +26,12 @@ void init_game_state(GameState *g_state) {
 }
 
 //changes the elements of the GameState struct as per the player key input
-int state_manager(char ch, GameState *g_state) {
+int state_manager(int ch, GameState *g_state) {
     DisplayState *d = &(g_state->d_state);
     PlayerState *p = &(g_state->p_state);
+
+    int* x = &(p->pos[d->mode][0]);
+    int* y = &(p->pos[d->mode][1]);
 
     //For arrow keys
     if(ch == 27) {  // Escape character
@@ -36,10 +39,6 @@ int state_manager(char ch, GameState *g_state) {
         if(ch == '[') {
             ch = getchar();  // Get the actual arrow key code
 
-            int* x = &(p->pos[d->mode][0]);
-            int* y = &(p->pos[d->mode][1]);
-            
-            
             switch (ch) {
                 case 'A':   //Up Arrow
                     if(*y > 0) (*y)--;
@@ -60,32 +59,24 @@ int state_manager(char ch, GameState *g_state) {
         switch (ch) {
             case 'm':   //toggling show_map
             case 'M': {
-                          //g_state->d_state.show_map = !(g_state->d_state.show_map);
-                          if(g_state->d_state.mode == 1) {
-                                g_state->d_state.mode = 0;
-                          }
-                          else if (g_state->d_state.mode == 2){
-                                g_state->d_state.mode = 1;
-                          }
-                          else {
-                                g_state->d_state.mode = 2;
-                          }
+                //g_state->d_state.show_map = !(g_state->d_state.show_map);
+                if(d->mode == 1) {
+                    d->mode = 0;
+                }
+                else if (d->mode == 2){
+                    d->mode = 1;
+                }
+                else {
+                    d->mode = 2;
+                }
 
-                          break;
-                      }
+                break;
+            }
 
             case 'e':   //closing the current game session
-            case 'E': {
-                          /*if(g_state->isActive == 2) {
-                            g_state->isActive = 1;
-                            }
-                            else if(g_state->isActive == 1) {
-                            g_state->isActive = 0;
-                            }*/
-                          (g_state->isActive)--;
-
-                          break;
-                      }
+            case 'E':
+                (g_state->isActive)--;
+                break;
         }
     }
 

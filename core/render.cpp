@@ -23,7 +23,11 @@ void printMatrix(int rows, int cols, const vector<vector<int>>& matrix, GameStat
             else {
                 printf("\x1b[48;5;%dm", matrix[i][j]);
             }
-            printf("%3c", ' ');
+            #ifdef _WIN32
+                printf("%2c", ' ');
+            #else
+                printf("%3c", ' ');
+            #endif
             printf("\x1b[0m");
         }
         printf("\n");
@@ -50,7 +54,11 @@ void printText(GameSession* game) {
     printf("\x1b[48;5;0m");
     printf("%3d%3d", game->g_state.p_state.pos[game->g_state.d_state.mode][0], game->g_state.p_state.pos[game->g_state.d_state.mode][1]);
     for(int i = 0; i < DISPLAY_X - 2; i++) {
-        printf("%3c", ' ');
+        #ifdef _WIN32
+            printf("%2c", ' ');
+        #else
+            printf("%3c", ' ');
+        #endif
     }
     printf("\x1b[0m\n");
 }
@@ -62,4 +70,6 @@ void render(unique_ptr<World>& w) {
     printDisplay(&(w->map), &(w->game[0].g_state));     //print the game display
 
     printText(&(w->game[0]));     //print the game text or dialogue
+
+    fflush(stdout);        //to immediately display the content within the output buffer
 }

@@ -6,6 +6,9 @@
 #define DISPLAY_X 30
 #define DISPLAY_Y 30
 
+#define TEXT_X 30
+#define TEXT_Y 1
+
 void printMatrix(int rows, int cols, const vector<vector<int>>& matrix, GameState *g_state);
 void printDisplay(WorldMap *map, GameState *g_state);
 void printText(GameSession* game);
