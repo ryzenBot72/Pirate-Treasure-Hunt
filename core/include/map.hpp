@@ -1,6 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#include <map>
 #include "island.hpp"
 
 using namespace std;
@@ -9,9 +10,14 @@ using namespace std;
 #define SEA_OVERVIEW_Y 41
 #define ISLAND_X 40
 #define ISLAND_Y 40
-
+/*
+typedef struct GraphList {
+    vector<vector<int>> gl;
+}GraphList;
+*/
 typedef struct WorldMap {
     //Graph graph;            //(change the type as per your implementation; this is just a placeholder); graph that represents the connections/relations between the islands.
+    map<int, vector<vector<int>>> graph;
     vector<Island> island;  //vector for islands; contains every possible parameter to set-up that island(coordinates, challenges, hints, random items, etc)
         
     vector<vector<int>> sea_overview{SEA_OVERVIEW_Y, vector<int>(SEA_OVERVIEW_X, 0)};

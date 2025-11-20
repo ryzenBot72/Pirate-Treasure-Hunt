@@ -64,8 +64,8 @@ int get_shortest_path_cost(WorldMap* map, int start_node, int end_node) {
 
         // Explore neighbors
         for (auto& edge : map->graph[u]) {
-            int v = edge.first;
-            int weight = edge.second;
+            int v = edge[0];
+            int weight = edge[1];
 
             if (dist[u] + weight < dist[v]) {
                 dist[v] = dist[u] + weight;
