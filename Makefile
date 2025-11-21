@@ -4,7 +4,7 @@ INCLUDE_DIR = $(SRC)/include
 
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -g
+CXXFLAGS = -Wall -g -lm
 IFLAGS = -I$(INCLUDE_DIR)
 
 # Source files
@@ -15,7 +15,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 ifeq ($(OS),Windows_NT)
     RM = del /Q
     EXE = game
-	CLEAN_CMD = for /f "delims=" %%f in ('dir /s /b core\*.o') do del /q "%%f"
+	CLEAN_CMD = del /q /s /f $(SRC)\*.o
 
 else
     RM = rm -f

@@ -12,6 +12,10 @@
 
 #if defined(_WIN32)
     #include <windows.h>
+    #ifdef byte
+    #undef btye
+    #endif
+
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
     DWORD original_mode;
 #else
