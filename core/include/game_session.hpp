@@ -17,5 +17,7 @@ typedef struct GameSession {
 
 void init_game_session(GameSession *game);
 
+void trigger_event(array<int,2> coords, WorldMap *map, GameState *g_state);
+
 #endif
 
