@@ -4,15 +4,7 @@ INCLUDE_DIR = $(SRC)/include
 
 # Compiler and flags
 CXX = g++
-<<<<<<< HEAD
-<<<<<<< HEAD
-CXXFLAGS = -Wall -g -lm
-=======
-CXXFLAGS = -std=c++20 -Wall -g -lm
->>>>>>> manthan
-=======
 CXXFLAGS = -std=c++14 -Wall -g -lm
->>>>>>> manthan
 IFLAGS = -I$(INCLUDE_DIR)
 
 EXE = game
@@ -24,12 +16,6 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 ifeq ($(OS),Windows_NT)
     RM = del /Q
-<<<<<<< HEAD
-    EXE = game
-	CLEAN_CMD = del /q /s /f $(SRC)\*.o
-
-=======
->>>>>>> manthan
 else
     RM = rm -f
 endif
