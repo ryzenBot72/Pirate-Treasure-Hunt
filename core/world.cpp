@@ -8,8 +8,12 @@ int main_loop(unique_ptr<World>& w) {
 
     render(w);
     while(curr_game->g_state.isActive != 0) {
-        state_manager(getchar(), &(curr_game->g_state));
+        /*while(!(curr_game->g_state.game_event.empty())) {
+            curr_game->g_state.game_event.pop();
+        }*/
+        state_manager(getchar(), &(curr_game->g_state), &(w->map));
         render(w);
+
     }
 
     return 0;

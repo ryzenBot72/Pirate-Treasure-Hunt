@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "game_state.hpp"
 #include "island.hpp" // Need this to know what a 'Clue' is
 
 using namespace std;
@@ -18,5 +19,7 @@ typedef struct Inventory {
 typedef struct Player {
     Inventory inventory;    
 } Player;
+
+void scan_player_area(WorldMap *map, GameState *g_state);
 
 #endif

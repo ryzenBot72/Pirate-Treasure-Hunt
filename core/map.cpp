@@ -1,14 +1,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <math.h>
-#include <iostream>
-#include <vector>
 #include <queue>
 #include <limits>
 #include <unordered_map>
 #include <string>
 
-// Include your headers
 #include "map.hpp"
 #include "utils.hpp"
 
@@ -120,17 +117,20 @@ void generate_islands(vector<Island>& island, int n) {
 }
 
 void init_matrix(WorldMap *map) {
-    // ... (Keep your team leader's existing logic for init_matrix here) ...
-    // Just copy paste the body of init_matrix from the file you sent me.
-    // It handles the coloring of sea and islands.
-    // (Omitted here to save space, but ensure it is pasted in your final file)
-    
+    //For the layer map, 
+    //0 = can't move, can't interact
+    //1 = can't move, can interact
+    //2 = can move, can't interact
+    //3 = can move, can interact
+
+
     /*------------SEA_OVERVIEW-------------*/
     //water
     srand(time(0));
     for(int i = 0; i < SEA_OVERVIEW_Y; i++) {
         for(int j = 0; j < SEA_OVERVIEW_X; j++) {
-            map->sea_overview[i][j] = random_tile(1);
+            map->sea_overview[0][i][j] = random_tile(1);
+            map->sea_overview[1][i][j] = 2;
         }
     }
 
@@ -138,7 +138,8 @@ void init_matrix(WorldMap *map) {
     for(size_t i = 0; i < map->island.size(); i++) {
         int x = map->island[i].coords[0];
         int y = map->island[i].coords[1];
-        map->sea_overview[y][x] = 40; //Green
+        map->sea_overview[0][y][x] = 40; //Green
+        map->sea_overview[1][y][x] = 1;
     }
     /*-------------------------------------*/
 
@@ -146,10 +147,21 @@ void init_matrix(WorldMap *map) {
     //land
     for(int i = 0; i < ISLAND_Y; i++) {
         for(int j = 0; j < ISLAND_X; j++) {
-            map->island_normal[i][j] = random_tile(2);
+            map->island_normal[0][i][j] = random_tile(2);
+            if(map->island_normal[0][i][j] == 240) {
+                map->island_normal[1][i][j] = 1;
+            }
+            else {
+                map->island_normal[1][i][j] = 2;
+            }
         }
     }
     /*-------------------------------------*/
+}
+
+void init_map_vector(WorldMap *map) {
+    map->type.push_back(&(map->sea_overview));
+    map->type.push_back(&(map->island_normal));
 }
 
 // --- MASTER INIT FUNCTION ---
@@ -158,4 +170,5 @@ void init_map(WorldMap *map) {
     create_graph(map);                // 2. Member B: Build Graph
     init_clues(map->island);          // 3. Member C: Populate Clues
     init_matrix(map);                 // 4. Render setup
+    init_map_vector(map);
 }

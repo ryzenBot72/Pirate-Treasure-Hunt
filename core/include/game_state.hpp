@@ -1,7 +1,11 @@
 #ifndef GAME_STATE_HPP
 #define GAME_STATE_HPP
 
+#include <queue>
+#include <array>
+#include "map.hpp"
 #include "island.hpp"
+//#include "render.hpp"
 
 using namespace std;
 
@@ -32,10 +36,15 @@ typedef struct DisplayState{
 typedef struct TextState{
     bool show_text;     //(0 - no text, 1 - display text)
                         //some more variables to be added
+    string s;
+    TextState() { s.reserve(30 * 3 * 30);}  // 30 is an arbitrary value, can change it if needed.
 } TextState;
 
 typedef struct GameState {
     int isActive;                   //is the game session active(0 : close game session; 1: show closing confirmation window; 2 : game session is running)
+    int proximity;
+    queue<array<int,2>> game_event;
+
     vector<IslandState> i_state;    //island visibility, status of items and challeges(how many challenges completed/ items received/ how many are left) per island
     PlayerState p_state;            /*current position, islands visited, alive/dead, energy, energy_deplete_rate(depends upon display state + abilities), progress(optional)
                                       (note, pixel to pixel jump speed will be the same for each display state, just the step size would vary, thus varing the energy consumption) */
@@ -46,7 +55,9 @@ typedef struct GameState {
 
 void init_game_state(GameState *g_state);
 
-int state_manager(int ch, GameState *g_state);
+void build_text(GameState *g_state, WorldMap *map);
+
+int state_manager(int ch, GameState *g_state, WorldMap *map);
 
 #endif
 

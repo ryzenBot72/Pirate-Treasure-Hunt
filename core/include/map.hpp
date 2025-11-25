@@ -19,9 +19,12 @@ typedef struct WorldMap {
     //Graph graph;            //(change the type as per your implementation; this is just a placeholder); graph that represents the connections/relations between the islands.
     map<int, vector<vector<int>>> graph;
     vector<Island> island;  //vector for islands; contains every possible parameter to set-up that island(coordinates, challenges, hints, random items, etc)
-        
-    vector<vector<int>> sea_overview{SEA_OVERVIEW_Y, vector<int>(SEA_OVERVIEW_X, 0)};
-    vector<vector<int>> island_normal{ISLAND_Y, vector<int>(ISLAND_X, 0)};
+
+    vector<vector<vector<vector<int>>>*> type;
+
+    vector<vector<vector<int>>> sea_overview{2, vector<vector<int>>{SEA_OVERVIEW_Y, vector<int>(SEA_OVERVIEW_X, 0)}};
+    
+    vector<vector<vector<int>>> island_normal{2, vector<vector<int>>{ISLAND_Y, vector<int>(ISLAND_X, 0)}};
 
 } WorldMap;
     
@@ -31,5 +34,6 @@ typedef struct WorldMap {
     void get_all_within_distance_k();            //function to fetch all islands connected to current island and are at a given distance
                                         //add more functions as per requirement
     void init_map(WorldMap *map);
+    void init_map_vector(WorldMap *map);
 #endif
 

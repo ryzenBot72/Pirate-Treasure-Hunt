@@ -7,13 +7,14 @@
 #endif
 
 //headers and global variables
-#include <stdio.h>
-#include "render.hpp"
-
 #if defined(_WIN32)
     #include <windows.h>
     #ifdef byte
+<<<<<<< HEAD
     #undef btye
+=======
+    #undef byte
+>>>>>>> manthan
     #endif
 
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
@@ -23,6 +24,8 @@
     #include <unistd.h>
 #endif
 
+#include <stdio.h>
+#include "render.hpp"
 
 
 // Function to get a character from the user in canonical mode;
