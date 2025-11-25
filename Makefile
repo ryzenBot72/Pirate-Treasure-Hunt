@@ -5,9 +5,13 @@ INCLUDE_DIR = $(SRC)/include
 # Compiler and flags
 CXX = g++
 <<<<<<< HEAD
+<<<<<<< HEAD
 CXXFLAGS = -Wall -g -lm
 =======
 CXXFLAGS = -std=c++20 -Wall -g -lm
+>>>>>>> manthan
+=======
+CXXFLAGS = -std=c++14 -Wall -g -lm
 >>>>>>> manthan
 IFLAGS = -I$(INCLUDE_DIR)
 
