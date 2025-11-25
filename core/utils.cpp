@@ -1,6 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <string>
+#include <cstdio>
+#include "game_state.hpp"
+
 //manually defining the flag as per its bit position (because it is apparently not already defined in windows.h)
 #ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
 #define ENABLE_VIRTUAL_TERMINAL_INPUT 0x0200
@@ -68,6 +72,17 @@ void reset_input_mode() {
 void clear_input_buffer() {
     char ch;
     while ((ch = getchar()) != '\n' && ch != EOF) {}
+}
+
+//Returns formatted string
+std::string sf(const char* fmt, ...)
+{
+    char buffer[TEXT_BUFFER_SIZE];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+    return std::string(buffer);
 }
 
 #endif

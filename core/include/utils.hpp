@@ -7,4 +7,6 @@ void reset_input_mode();
 
 void clear_input_buffer();
 
+std::string sf(const char* fmt, ...);
+
 #endif

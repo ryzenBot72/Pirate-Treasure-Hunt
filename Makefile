@@ -4,7 +4,7 @@ INCLUDE_DIR = $(SRC)/include
 
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++20 -Wall -g -lm
+CXXFLAGS = -std=c++14 -Wall -g -lm
 IFLAGS = -I$(INCLUDE_DIR)
 
 EXE = game

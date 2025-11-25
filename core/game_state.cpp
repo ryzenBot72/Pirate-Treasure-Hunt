@@ -1,8 +1,8 @@
 #include "game_state.hpp"
 #include "render.hpp"
-#include <format>
-#include <stdio.h>
-#include <iostream>
+#include "utils.hpp"
+#include <cstdio>
+#include <iostream> 
 
 using namespace std;
 
@@ -40,8 +40,8 @@ void init_game_state(GameState *g_state) {
 void build_text(GameState *g_state, WorldMap *map) {
     string *s = &(g_state->t_state.s);
 
-    *s += format("{: ^3}{: ^3}", g_state->p_state.pos[g_state->d_state.mode][0], g_state->p_state.pos[g_state->d_state.mode][1]);
-    *s += format("{: ^3}\n", g_state->game_event.size());
+    *s += sf("%3d%3d", g_state->p_state.pos[g_state->d_state.mode][0], g_state->p_state.pos[g_state->d_state.mode][1]);
+    *s += sf("%3d\n", g_state->game_event.size());
 
 
     if(g_state->game_event.size() != 0) {
@@ -55,8 +55,7 @@ void build_text(GameState *g_state, WorldMap *map) {
         }
 
         for(int i = 1; !temp.empty(); i++) {
-            *s += format("{}\n", i);
-            
+            *s += sf("%i\n", i);            
             temp.pop();
         }
     }

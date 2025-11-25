@@ -7,6 +7,8 @@
 #include "island.hpp"
 //#include "render.hpp"
 
+#define TEXT_BUFFER_SIZE 30 * 3 * 1024        // 30 is an arbitrary value, can change it if needed.
+
 using namespace std;
 
 typedef struct IslandState {
@@ -37,7 +39,7 @@ typedef struct TextState{
     bool show_text;     //(0 - no text, 1 - display text)
                         //some more variables to be added
     string s;
-    TextState() { s.reserve(30 * 3 * 30);}  // 30 is an arbitrary value, can change it if needed.
+    TextState() { s.reserve(TEXT_BUFFER_SIZE);}
 } TextState;
 
 typedef struct GameState {
