@@ -4,8 +4,10 @@ INCLUDE_DIR = $(SRC)/include
 
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -Wall -g
+CXXFLAGS = -std=c++20 -Wall -g -lm
 IFLAGS = -I$(INCLUDE_DIR)
+
+EXE = game
 
 # Source files
 SOURCES = $(wildcard $(SRC)/*.cpp)
@@ -14,13 +16,8 @@ OBJECTS = $(SOURCES:.cpp=.o)
 
 ifeq ($(OS),Windows_NT)
     RM = del /Q
-    EXE = game
-	CLEAN_CMD = for /f "delims=" %%f in ('dir /s /b core\*.o') do del /q "%%f"
-
 else
     RM = rm -f
-    EXE = game
-	CLEAN_CMD = $(RM) $(SRC)/*.o $(EXE)
 endif
 
 
@@ -37,7 +34,9 @@ $(SRC)/%.o: $(SRC)/%.cpp
 
 # Clean up
 clean:
-	-$(CLEAN_CMD)
+	-$(RM) core/*.o core/*.obj core/*.d *.exe *.exe.manifest 2>nul || \
+	del /Q /F core\*.o core\*.obj core\*.d *.exe *.exe.manifest >nul 2>&1 || \
+	cmd /C exit 0
 
 # Phony targets
 .PHONY: all clean

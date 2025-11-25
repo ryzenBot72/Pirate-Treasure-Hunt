@@ -7,11 +7,12 @@
 #endif
 
 //headers and global variables
-#include <stdio.h>
-#include "render.hpp"
-
 #if defined(_WIN32)
     #include <windows.h>
+    #ifdef byte
+    #undef byte
+    #endif
+
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
     DWORD original_mode;
 #else
@@ -19,6 +20,8 @@
     #include <unistd.h>
 #endif
 
+#include <stdio.h>
+#include "render.hpp"
 
 
 // Function to get a character from the user in canonical mode;
