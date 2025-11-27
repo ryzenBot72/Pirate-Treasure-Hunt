@@ -15,21 +15,25 @@ typedef struct Clue {
     bool isFound;       // Has the player found this yet?
 } Clue;
 
-typedef struct Events {
+typedef struct Event {
     int type;           // 0 = nothing, 1 = Clue, 2 = Trap
+    string name;
     string description;
     Clue clueData;      // Embed the clue inside the event
 } Events;
 //MEMBER C UPDATE END
 
-typedef struct Items {
-    //type of item, associated data 
-    string name; // Added name
-} Items;
+// --- MEMBER A: Item Definition ---
+typedef struct Item {
+    string name;
+    string description;
+    int value; // Gold value or Energy restore amount
+} Item;
+// ---------------------------------
 
 typedef struct IslandStuff {
-    vector<Events> events;  // Member C: Clues stored here
-    vector<Items> items;    
+    vector<Event> events;  // Member C: Clues stored here
+    vector<Item> items;    
 } IslandStuff;
 
 typedef struct Island {

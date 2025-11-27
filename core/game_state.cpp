@@ -25,7 +25,15 @@ void init_game_state(GameState *g_state) {
         p->pos[i][0] = 0;
         p->pos[i][1] = 0;
     }
+    
+    // --- MEMBER A: Init Stats ---
     p->isAlive = true;
+    p->energy = 100.0f;      // Start with full energy
+    p->max_energy = 100.0f;
+    p->gold = 0;             // Start with 0 gold
+    p->deplete_rate = 0.5f;  // Rate of energy loss per move
+    // ----------------------------
+
     p->x_max = DISPLAY_X;
     p->y_max = DISPLAY_Y;
 
@@ -41,7 +49,8 @@ void build_text(GameState *g_state, WorldMap *map) {
     string *s = &(g_state->t_state.s);
 
     *s += sf("%3d%3d", g_state->p_state.pos[g_state->d_state.mode][0], g_state->p_state.pos[g_state->d_state.mode][1]);
-    *s += sf("%3d\n", g_state->game_event.size());
+    *s += sf("%3d", g_state->game_event.size());
+    *s += sf("%8.2f\n", g_state->p_state.energy);
 
 
     if(g_state->game_event.size() != 0) {
@@ -71,6 +80,16 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
 
     int* x = &(p->pos[d->mode][0]);
     int* y = &(p->pos[d->mode][1]);
+    bool moved = false;
+
+
+    // --- MEMBER A: Death Check ---
+    // If player is dead, don't allow movement
+    if (!p->isAlive && ch != 'e' && ch != 'E') {
+        return 0; 
+    }
+    // -----------------------------
+
 
     //For arrow keys
     if(ch == 27) {  // Escape character
@@ -79,22 +98,43 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
             ch = getchar();  // Get the actual arrow key code
             switch (ch) {
                 case 'A': //Up
-                    if(*y > 0 && (*map->type[d->mode - 1])[1][*y - 1][*x] >= 2)
+                    if(*y > 0 && (*map->type[d->mode - 1])[1][*y - 1][*x] >= 2) {
                         (*y)--;
+                        moved = true;
+                    }
                     break;
                 case 'B': //Down
-                    if(*y < p->y_max && (*map->type[d->mode - 1])[1][*y + 1][*x] >=  2)
+                    if(*y < p->y_max && (*map->type[d->mode - 1])[1][*y + 1][*x] >=  2) {
                         (*y)++;
+                        moved = true;
+                    }
                     break;
                 case 'C': //Right
-                    if(*x < p->x_max && (*map->type[d->mode - 1])[1][*y][*x + 1] >= 2)
+                    if(*x < p->x_max && (*map->type[d->mode - 1])[1][*y][*x + 1] >= 2) {
                         (*x)++;
+                        moved = true;
+                    }
                     break;
                 case 'D': //Left
-                    if(*x > 0 && (*map->type[d->mode - 1])[1][*y][*x - 1] >= 2)
+                    if(*x > 0 && (*map->type[d->mode - 1])[1][*y][*x - 1] >= 2) {
                         (*x)--;
+                        moved = true;
+                    }
                     break;
             }
+
+            // --- MEMBER A: Energy Deduction ---
+            if (moved) {
+                p->energy -= p->deplete_rate;
+                if (p->energy <= 0) {
+                    p->energy = 0;
+                    p->isAlive = false;
+                    // In a real game, we would trigger a "Game Over" screen here
+                    g_state->isActive = 0;
+                }
+            }
+            // ---------------------------------
+
         }
     }
     else {
@@ -128,6 +168,16 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
             }
             // -------------------------
 
+            // --- MEMBER A: Inventory Access ---
+            case 'i':
+            case 'I': {
+                // Toggle Inventory View (Future implementation)
+                // For now, we could print status to console
+                // printf("Energy: %.1f | Gold: %d\n", p->energy, p->gold);
+                break;
+            }
+            // ---------------------------------
+
             case 'e':   //closing the current game session
             case 'E':
                 (g_state->isActive)--;
@@ -152,7 +202,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
             trigger_event(g_state->game_event.front(), map, g_state);
         }
     }
-
+    
     // Boundary checks
     if(d->mode == 1) {
         p->x_max = SEA_OVERVIEW_X - 1;

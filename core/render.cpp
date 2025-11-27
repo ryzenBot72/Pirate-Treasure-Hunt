@@ -152,6 +152,6 @@ void render(unique_ptr<World>& w) {
     printDisplay(&(w->map), &(w->game[0].g_state));     //print the game display
 
     printText(&(w->game[0]));     //print the game text or dialogue
-//    cout<<w->game[0].g_state.t_state.s<<endl;
+
     fflush(stdout);        //to immediately display the content within the output buffer
 }

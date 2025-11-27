@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstdio>
+#include <cstdarg>
 #include "game_state.hpp"
 
 //manually defining the flag as per its bit position (because it is apparently not already defined in windows.h)
