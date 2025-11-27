@@ -14,11 +14,7 @@
 #if defined(_WIN32)
     #include <windows.h>
     #ifdef byte
-<<<<<<< HEAD
-    #undef btye
-=======
     #undef byte
->>>>>>> manthan
     #endif
 
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
