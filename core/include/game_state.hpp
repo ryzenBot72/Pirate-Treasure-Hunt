@@ -22,7 +22,13 @@ typedef struct PlayerState {
     bool isAlive;
     int pos[3][2];      //(x,y) coordinates of the player
     vector<int> visited;
-    float energy;
+
+    // --- MEMBER A: Stats ---
+    float energy;       // Current Energy
+    float max_energy;   // Maximum Energy (Capacity)
+    int gold;           // Current Gold
+    // -----------------------
+
     float deplete_rate;
     int x_max;          //x-direction limit of the player movement(x boundary of the map)
     int y_max;          //y-direction limit of the player movement(y boundary of the map)
