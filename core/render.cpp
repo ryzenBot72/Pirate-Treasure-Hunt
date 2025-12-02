@@ -2,7 +2,7 @@
 #include <iostream>
 
 //print the matrix representing the game display
-void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, GameState *g_state) {
+void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, GameState *g_state, WorldMap *map) {
     int (*pos)[2] = g_state->p_state.pos;
     int (*disp)[2] = g_state->d_state.disp;
     DisplayState *d = &(g_state->d_state);
@@ -18,16 +18,21 @@ void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, 
     //printing the actual diplay matrix using the 'display point'
     for(int i = disp[d->mode][1]; i < disp[d->mode][1] + DISPLAY_Y; i++) {
         for(int j = disp[d->mode][0]; j < disp[d->mode][0] + DISPLAY_X; j++) {
+            printf("\x1b[38;5;0m");
             if(j == pos[d->mode][0] && i == pos[d->mode][1]) {
-                printf("\x1b[48;5;160m");
+                printf("\x1b[48;5;160m");   //Player red icon
             }
             else {
-                printf("\x1b[48;5;%dm", matrix[0][i][j]);
+                printf("\x1b[48;5;%dm", matrix[0][i][j]);   //Rest of the map boxes
             }
             #ifdef _WIN32
                 printf("%2c", ' ');
             #else
-                printf("%3c", ' ');
+                int id = find_island(map, j, i);
+                if(d->mode == 1 && id >= 0)
+                    printf(" %d ", id);
+                else
+                    printf("%3c", ' ');
             #endif
             printf("\x1b[0m");
         }
@@ -41,11 +46,11 @@ void printDisplay(WorldMap *map, GameState *g_state) {
                     break;
                 }
         case 1: {
-                    printMatrix(SEA_OVERVIEW_Y, SEA_OVERVIEW_X, map->sea_overview, g_state);
+                    printMatrix(SEA_OVERVIEW_Y, SEA_OVERVIEW_X, map->sea_overview, g_state, map);
                     break;
                 }
         case 2: {
-                    printMatrix(ISLAND_Y, ISLAND_X, map->island_normal, g_state);
+                    printMatrix(ISLAND_Y, ISLAND_X, map->island_normal, g_state, map);
                     break;
                 }
     }
@@ -147,11 +152,15 @@ void printText(GameSession* game) {
 
 //Display the game
 void render(unique_ptr<World>& w) {
-    printf("\x1b[1;1H\x1b[2J\x1b[3J");      //clear the entire screen
+    //Clear the entire screen
+    printf("\x1b[1;1H\x1b[2J\x1b[3J");
 
-    printDisplay(&(w->map), &(w->game[0].g_state));     //print the game display
+    //Print the game display
+    printDisplay(&(w->map), &(w->game[0].g_state));
 
-    printText(&(w->game[0]));     //print the game text or dialogue
+    //Print the game text or dialogue
+    printText(&(w->game[0]));
 
-    fflush(stdout);        //to immediately display the content within the output buffer
+    //To immediately display the content present in the output buffer
+    fflush(stdout);
 }

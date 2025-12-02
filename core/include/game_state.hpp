@@ -12,7 +12,7 @@
 using namespace std;
 
 typedef struct IslandState {
-    int id;
+//    int id;
     bool isVisible;         //is the island visible on the map(yes/no)
     IslandStuff pending;    //to be initialised at the beginning of the game session using the default values in the island struct
     IslandStuff visited;
@@ -29,7 +29,7 @@ typedef struct PlayerState {
     int gold;           // Current Gold
     // -----------------------
 
-    float deplete_rate;
+    float deplete_rate[3];
     int x_max;          //x-direction limit of the player movement(x boundary of the map)
     int y_max;          //y-direction limit of the player movement(y boundary of the map)
 
@@ -45,12 +45,14 @@ typedef struct TextState{
     bool show_text;     //(0 - no text, 1 - display text)
                         //some more variables to be added
     string s;
+    string t;
     TextState() { s.reserve(TEXT_BUFFER_SIZE);}
 } TextState;
 
 typedef struct GameState {
     int isActive;                   //is the game session active(0 : close game session; 1: show closing confirmation window; 2 : game session is running)
     int proximity;
+    int last_key;
     queue<array<int,2>> game_event;
 
     vector<IslandState> i_state;    //island visibility, status of items and challeges(how many challenges completed/ items received/ how many are left) per island
@@ -63,7 +65,7 @@ typedef struct GameState {
 
 void init_game_state(GameState *g_state);
 
-void build_text(GameState *g_state, WorldMap *map);
+void build_text(int ch, GameState *g_state, WorldMap *map);
 
 int state_manager(int ch, GameState *g_state, WorldMap *map);
 

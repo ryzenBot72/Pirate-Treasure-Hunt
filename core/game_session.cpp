@@ -14,7 +14,7 @@ void trigger_event(array<int,2> coords, WorldMap *map, GameState *g_state) {
 
     if(mode == 1 && layer == 1) {
         for(long unsigned int i = 0; i < map->island.size(); i++) {     //Traverse throught list of islands
-            if(map->island[i].coords[0] == x && map->island[i].coords[1] == y) {    //Match the event coordinates with island coorinates. If matched, we found the island, and thus its data
+            if(map->island[i].coords[0] == x && map->island[i].coords[1] == y) {    //Match the event coordinates with island coordinates. If matched, we found the island, and thus its data
                 g_state->d_state.mode = 2;                
             }
         }
