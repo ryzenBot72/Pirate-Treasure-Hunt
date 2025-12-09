@@ -3,8 +3,8 @@
 
 #include "world.hpp"
 
-#define DISPLAY_X 30
-#define DISPLAY_Y 30
+#define DISPLAY_X 40
+#define DISPLAY_Y 28
 
 #define TEXT_X 30
 #define TEXT_Y 1

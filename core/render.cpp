@@ -2,33 +2,63 @@
 #include <iostream>
 
 //print the matrix representing the game display
-void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, GameState *g_state) {
+void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, GameState *g_state, WorldMap *map) {
     int (*pos)[2] = g_state->p_state.pos;
     int (*disp)[2] = g_state->d_state.disp;
     DisplayState *d = &(g_state->d_state);
 
-    //if statements to change the coordinates of the 'display point(matrix[0][0])' based on the postion of the player on the map.
-    if(pos[d->mode][0] >= (DISPLAY_X - 1)/2 && pos[d->mode][0] < cols - (DISPLAY_X/2)) {
-        disp[d->mode][0] = pos[d->mode][0] - (DISPLAY_X - 1)/ 2;
+    // Change the coordinates of the 'display point(matrix[0][0])' based on the postion of the player on the map.
+    if(pos[d->mode][0] >= (DISPLAY_X - 1)/2) {
+        if(pos[d->mode][0] < cols - (DISPLAY_X/2)) {
+            disp[d->mode][0] = pos[d->mode][0] - (DISPLAY_X - 1)/ 2;
+        }
+        else {
+            disp[d->mode][0] = cols - (DISPLAY_X);
+        }
     }
-    if(pos[d->mode][1] >= (DISPLAY_Y - 1)/2 && pos[d->mode][1] < rows - (DISPLAY_Y/2)) {
-        disp[d->mode][1] = pos[d->mode][1] - (DISPLAY_Y - 1)/ 2;
+    else {
+        disp[d->mode][0] = 0;
+    }
+ 
+    if(pos[d->mode][1] >= (DISPLAY_Y - 1)/2) {
+        if(pos[d->mode][1] < rows - (DISPLAY_Y/2)) {
+            disp[d->mode][1] = pos[d->mode][1] - (DISPLAY_Y - 1)/ 2;
+        }
+        else {
+            disp[d->mode][1] = rows - (DISPLAY_Y);
+        }
+    }
+    else {
+        disp[d->mode][1] = 0;
     }
 
     //printing the actual diplay matrix using the 'display point'
-    for(int i = disp[d->mode][1]; i < disp[d->mode][1] + DISPLAY_Y; i++) {
+    for(int i = disp[d->mode][1], k = 0; i < disp[d->mode][1] + DISPLAY_Y; i++) {
         for(int j = disp[d->mode][0]; j < disp[d->mode][0] + DISPLAY_X; j++) {
+            printf("\x1b[38;5;0m");
             if(j == pos[d->mode][0] && i == pos[d->mode][1]) {
-                printf("\x1b[48;5;160m");
+                printf("\x1b[48;5;%dm", proximity_color(g_state, map));   //Player icon
             }
             else {
-                printf("\x1b[48;5;%dm", matrix[0][i][j]);
+                printf("\x1b[48;5;%dm", matrix[0][i][j]);   //Rest of the map boxes
             }
-            #ifdef _WIN32
+
+            int id = find_island(map, j, i);
+
+            if(d->mode == 1 && id >= 0) {
+                printf(" %d", id);
+            }
+            else if (d->mode == 2 && k < (int)g_state->game_event.size() && j == g_state->game_event[k][0] && i == g_state->game_event[k][1]) {
+                printf(" %d", k + 1);
+                k++;
+            }
+            else
                 printf("%2c", ' ');
-            #else
-                printf("%3c", ' ');
+
+            #ifdef __linux__
+                printf(" ");
             #endif
+
             printf("\x1b[0m");
         }
         printf("\n");
@@ -41,11 +71,11 @@ void printDisplay(WorldMap *map, GameState *g_state) {
                     break;
                 }
         case 1: {
-                    printMatrix(SEA_OVERVIEW_Y, SEA_OVERVIEW_X, map->sea_overview, g_state);
+                    printMatrix(SEA_OVERVIEW_Y, SEA_OVERVIEW_X, map->sea_overview, g_state, map);
                     break;
                 }
         case 2: {
-                    printMatrix(ISLAND_Y, ISLAND_X, map->island_normal, g_state);
+                    printMatrix(ISLAND_Y, ISLAND_X, map->island_canvas, g_state, map);
                     break;
                 }
     }
@@ -53,7 +83,7 @@ void printDisplay(WorldMap *map, GameState *g_state) {
 
 void printText(GameSession* game) {
     string *s = &(game->g_state.t_state.s);
-    bool stop = false;
+//    bool stop = false;
     int limit = DISPLAY_X * 3;
     printf("\x1b[48;5;0m");
 /*
@@ -72,10 +102,10 @@ void printText(GameSession* game) {
     } while(!stop);*/
 
     for(int i = 0, j = 0, k = 0; (*s)[i] != 0;) {
-        while((*s)[j] != ' ' && (*s)[j] != '\n' && (*s)[j] != 0) {
+        while((*s)[j] != ' ' && (*s)[j] != '\n' && (*s)[j] != 0 && (*s)[j] != '\x1b') {
             j++;
         }
-
+        
         if(k + (j - i) == limit) {
             while(i < j) {
                 putchar((*s)[i++]);
@@ -87,6 +117,7 @@ void printText(GameSession* game) {
             putchar('\n');
 
             i++;
+         
             j = i;
             k = 0;
             continue;
@@ -131,6 +162,17 @@ void printText(GameSession* game) {
 
                 continue;
             }
+            else if((*s)[j] == '\x1b') {
+                i = j;
+                while((*s)[j] != 'm') {
+                    putchar((*s)[j++]);
+                    //k -= j - i;
+                }
+                putchar('m');
+                j++;
+                i = j;
+                continue;
+            }
             else {
                 putchar(' ');
                 i++;
@@ -142,16 +184,20 @@ void printText(GameSession* game) {
     }
 
 
-    printf("\x1b[0m\n");
+    printf("\x1b[0m");
 }
 
 //Display the game
 void render(unique_ptr<World>& w) {
-    printf("\x1b[1;1H\x1b[2J\x1b[3J");      //clear the entire screen
+    //Clear the entire screen
+    printf("\x1b[1;1H\x1b[2J\x1b[3J");
 
-    printDisplay(&(w->map), &(w->game[0].g_state));     //print the game display
+    //Print the game display
+    printDisplay(&(w->map), &(w->game[0].g_state));
 
-    printText(&(w->game[0]));     //print the game text or dialogue
+    //Print the game text or dialogue
+    printText(&(w->game[0]));
 
-    fflush(stdout);        //to immediately display the content within the output buffer
+    //To immediately display the content present in the output buffer
+    fflush(stdout);
 }

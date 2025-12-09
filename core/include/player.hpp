@@ -1,6 +1,8 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+typedef struct GameState Gamestate;
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -45,5 +47,7 @@ typedef struct Player {
 } Player;
 
 void scan_player_area(WorldMap *map, GameState *g_state);
+
+void set_pos(GameState *g_state, int i, int j);
 
 #endif

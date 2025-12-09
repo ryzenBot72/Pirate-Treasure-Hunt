@@ -29,3 +29,5 @@ tags
 game
 
 nul
+*.txt
+reference.hpp
