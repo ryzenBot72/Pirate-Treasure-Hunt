@@ -1,10 +1,14 @@
 #ifndef GAME_STATE_HPP
 #define GAME_STATE_HPP
 
-#include <queue>
+typedef struct Player Player;
+
+#include <deque>
 #include <array>
 #include "map.hpp"
 #include "island.hpp"
+#include "player.hpp"
+//#include "game_session.hpp"
 //#include "render.hpp"
 
 #define TEXT_BUFFER_SIZE 30 * 3 * 1024        // 30 is an arbitrary value, can change it if needed.
@@ -13,7 +17,7 @@ using namespace std;
 
 typedef struct IslandState {
 //    int id;
-    bool isVisible;         //is the island visible on the map(yes/no)
+//    bool isVisible;         //is the island visible on the map(yes/no)
     IslandStuff pending;    //to be initialised at the beginning of the game session using the default values in the island struct
     IslandStuff visited;
 } IslandState;
@@ -21,6 +25,7 @@ typedef struct IslandState {
 typedef struct PlayerState {
     bool isAlive;
     int pos[3][2];      //(x,y) coordinates of the player
+    bool search_mode;
     vector<int> visited;
 
     // --- MEMBER A: Stats ---
@@ -30,6 +35,7 @@ typedef struct PlayerState {
     // -----------------------
 
     float deplete_rate[3];
+    float total_distance;
     int x_max;          //x-direction limit of the player movement(x boundary of the map)
     int y_max;          //y-direction limit of the player movement(y boundary of the map)
 
@@ -46,6 +52,7 @@ typedef struct TextState{
                         //some more variables to be added
     string s;
     string t;
+    string r;
     TextState() { s.reserve(TEXT_BUFFER_SIZE);}
 } TextState;
 
@@ -53,7 +60,7 @@ typedef struct GameState {
     int isActive;                   //is the game session active(0 : close game session; 1: show closing confirmation window; 2 : game session is running)
     int proximity;
     int last_key;
-    queue<array<int,2>> game_event;
+    deque<array<int,3>> game_event;
 
     vector<IslandState> i_state;    //island visibility, status of items and challeges(how many challenges completed/ items received/ how many are left) per island
     PlayerState p_state;            /*current position, islands visited, alive/dead, energy, energy_deplete_rate(depends upon display state + abilities), progress(optional)
@@ -63,11 +70,15 @@ typedef struct GameState {
 } GameState;
 
 
-void init_game_state(GameState *g_state);
+void init_game_state(GameState *g_state, WorldMap *map);
+
+int proximity_color(GameState *g_state, WorldMap *map);
+
+//void scan_player_area(WorldMap *map, GameState *g_state);
 
 void build_text(int ch, GameState *g_state, WorldMap *map);
 
-int state_manager(int ch, GameState *g_state, WorldMap *map);
+int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player);
 
 #endif
 

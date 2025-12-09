@@ -52,9 +52,9 @@ void create_graph(WorldMap* map) {
     for (int i = 0; i < map->g.I; i++) {
         for (int j = i + 1; j < map->g.I; j++) {
             int cost = calculate_distance(map->island[i].coords, map->island[j].coords) - 8;
-            if(cost < 0) {
+            /*if(cost < 0) {
                 cost = 0;
-            }
+            }*/
     
             // Member B: Adding Weighted Edges (Weight = Distance)
             addConnection(&(map->g), i, j, cost);
@@ -70,9 +70,9 @@ void update_graph(WorldMap *map, int *pos) {
 
     for(int i = 0; i < p; i++) {
         cost = calculate_distance(map->island[i].coords, pos) - 8;
-        if(cost < 0) {
+        /*if(cost < 0) {
             cost = 0;
-        }
+        }*/
 
         map->g.adj[i][p - 1] = {p, cost};
         map->g.adj[p][i] = {i, cost};
@@ -100,7 +100,7 @@ Path run_Dijkstra (WorldMap* map, int start, int target){
         p.cost = cost;
         pq.pop();
 
-        if(u == target) // reached destination — shortest path found
+        if(u == target) // reached destination; shortest path found
             break;
 
         if(cost > dist[u]) // ignore outdated entries
@@ -109,7 +109,10 @@ Path run_Dijkstra (WorldMap* map, int start, int target){
         for(const auto& p : map->g.adj.at(u)) { // explore all neighbors of island u
             int v = p.first;               // neighbor island ID
             int w = p.second;              // travel cost to that island
-
+            if(w < 0) { 
+                w = 0;
+            }
+            
             if(dist[u] + w < dist[v]) {    // found a cheaper path
                 dist[v] = dist[u] + w;
                 pq.push({dist[v], v});     // push updated cost
@@ -128,15 +131,22 @@ Path run_Dijkstra (WorldMap* map, int start, int target){
         current_node = parent[current_node];
     }
     reverse(p.path.begin(), p.path.end());
+    
+    //p.cost += 8;
 
     return p;
 }
 
 // MEMBER C: CLUE INITIALIZATION
 
-void init_clues(vector<Island>& island) {
+string build_clue_text(WorldMap *map, int pos) {
+    return {};
+}
+
+
+void init_clues(WorldMap *map) {
     // Member C: Using an Array of strings to store riddle data
-    string clues_db[] = {
+/*    string clues_db[] = {
         "The start is near...", 
         "Look beneath the ancient palm.", 
         "Walk ten paces east from the skull rock.", 
@@ -148,21 +158,90 @@ void init_clues(vector<Island>& island) {
     for(size_t i = 0; i < island.size(); i++) {
         // Ensure we don't go out of bounds of our clue database
         if (i < 5) {
-            Events ev;
+            Events ev;  
             ev.type = 1; // 1 represents a CLUE
             ev.description = "Clue: " + clues_db[i];
             // Add event to the island's event vector
             island[i].initial.events.push_back(ev);
         }
+    }*/
+    srand(time(0));
+//    string t;
+    Events ev;
+    vector<int> arr = {0,1,2,3,4};
+    int id, curr;
+    id = rand() % map->island.size();
+    map->clue_start = id;
+    for(size_t i = 0; i < map->island.size(); i++) {
+        ev.type = 1;
+        ev.clueData.id = i;
+        //ev.clueData.riddle = clues_db[i];
+        ev.pos[0] = rand() % (ISLAND_X - 9) + 4;
+        ev.pos[1] = rand() % (ISLAND_Y - 9) + 4;
+
+//        t = build_clue_text(WorldMap *map, ev.pos);
+
+
+        curr = arr[id];
+        arr.erase(arr.begin() + id);
+        
+        id = rand() % ((int)map->island.size() - i);
+        if(id > 0) { id--; }
+
+    
+        ev.clueData.riddle = sf("Go to %d", arr[id]);
+        map->island[curr].initial.events.push_back(ev);
     }
+    map->clue_end = curr;
+    map->island[curr].initial.events[0].type = 2;
+    map->island[curr].initial.events[0].clueData.riddle = "You unlocked the Treasure!\n";
 }
 
 
-// --- EXISTING MAP GENERATION LOGIC ---
 
 int random_tile(int type) {
-    int tile[2][5] = {{39, 33, 39, 33, 39}, {240, 76, 220, 112, 112}};
+    int tile[2][5] = {{27, 27, 21, 21, 21}, {240, 76, 220, 112, 112}};
     return tile[type - 1][(int)sqrt(rand() % 25)];
+}
+
+float closest_island_distance(WorldMap *map, int x, int y) {
+    float min_dist = ISLAND_X + ISLAND_Y;
+    float dist;
+    
+    for(size_t k = 0; k < map->island.size(); k++) {
+        dist = sqrt(pow(x - map->island[k].coords[0], 2) + pow(y - map->island[k].coords[1], 2));
+        if(dist < min_dist)
+            min_dist = dist;
+    }
+
+    return min_dist;
+}
+
+int sea_col(WorldMap *map, int x, int y) {
+    float dist = closest_island_distance(map, x, y);
+
+    if(dist < 1.5) {
+        return 51;
+    }
+    if(dist >= 1.5 && dist < 2.8) {
+        return 45;
+    }
+    else if(dist >= 2.8 && dist < 3.9) {
+        return 39;
+    }
+    else if(dist >= 3.9 && dist < 4.6) {
+        return 33;
+    }
+    else if(dist >= 4.6 && dist < 5.4) {
+        return 27;
+    }
+    else if(dist >= 5.4 && dist < 6.1){
+        return 27;
+    }
+    else {
+        return random_tile(1);
+        //return 21;
+    }
 }
 
 void generate_islands(vector<Island>& island, int n) {
@@ -188,7 +267,8 @@ void init_matrix(WorldMap *map) {
     srand(time(0));
     for(int i = 0; i < SEA_OVERVIEW_Y; i++) {
         for(int j = 0; j < SEA_OVERVIEW_X; j++) {
-            map->sea_overview[0][i][j] = random_tile(1);
+            //map->sea_overview[0][i][j] = random_tile(1);
+            map->sea_overview[0][i][j] = sea_col(map, j, i);
             map->sea_overview[1][i][j] = 2;
         }
     }
@@ -214,13 +294,14 @@ void init_matrix(WorldMap *map) {
                 map->island_normal[1][i][j] = 2;
             }
         }
+
     }
     /*-------------------------------------*/
 }
 
 void init_map_vector(WorldMap *map) {
     map->type.push_back(&(map->sea_overview));
-    map->type.push_back(&(map->island_normal));
+    map->type.push_back(&(map->island_canvas));
 }
 
 int find_island(WorldMap *map, int x, int y) {
@@ -232,11 +313,39 @@ int find_island(WorldMap *map, int x, int y) {
     return -1;
 }
 
-// --- MASTER INIT FUNCTION ---
+// --- master map initialisation function ---
 void init_map(WorldMap *map) {
-    generate_islands(map->island, 7); // 1. Create Islands
-    create_graph(map);                // 2. Member B: Build Graph
-    init_clues(map->island);          // 3. Member C: Populate Clues
-    init_matrix(map);                 // 4. Render setup
-    init_map_vector(map);
+    generate_islands(map->island, 5); // Create Islands
+    create_graph(map);                // Member B: Build Graph
+    init_clues(map);                  // Member C: Populate Clues
+    init_matrix(map);                 // Render setup
+    init_map_vector(map);           // Map type pointers
+}
+
+void build_canvas(WorldMap *map, int id) {
+    int i,j; 
+
+    // Copy the island template onto the island canvas
+    for(i = 0; i < ISLAND_Y; i++) {
+        for(j = 0; j < ISLAND_X; j++) {
+            map->island_canvas[0][i][j] = map->island_normal[0][i][j];
+            map->island_canvas[1][i][j] = map->island_normal[1][i][j];
+        }
+    }
+
+    srand(time(0));
+    //Generate random coordinates
+    j = rand() % ISLAND_X;
+    i = rand() % ISLAND_Y;
+    //Place the energy booster onto the above generated coordinates
+    map->island_canvas[0][i][j] = 164;
+    map->island_canvas[1][i][j] = 3;
+
+    //Place the clue onto the island
+    if(map->island[id].initial.events.size() != 0) {
+        j = map->island[id].initial.events[0].pos[0];
+        i = map->island[id].initial.events[0].pos[1];
+        map->island_canvas[1][i][j] = 1;
+        map->island_canvas[0][i][j] = 240; //29 earlier (dark green)
+    }
 }

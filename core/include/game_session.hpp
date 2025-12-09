@@ -15,9 +15,9 @@ typedef struct GameSession {
 } GameSession;
 
 
-void init_game_session(GameSession *game);
+void init_game_session(GameSession *game, WorldMap *map);
 
-void trigger_event(array<int,2> coords, WorldMap *map, GameState *g_state);
+void trigger_event(array<int,3> coords, WorldMap *map, GameState *g_state, Player *player);
 
 #endif
 

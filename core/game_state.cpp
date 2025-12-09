@@ -1,11 +1,13 @@
 #include "game_state.hpp"
 #include "render.hpp"
 #include "text.hpp"
+#include "utils.hpp"
+#include "game_session.hpp"
 
 using namespace std;
 
 //Initialise the GameState struct
-void init_game_state(GameState *g_state) {
+void init_game_state(GameState *g_state, WorldMap *map) {
     PlayerState *p = &(g_state->p_state);
     DisplayState *d = &(g_state->d_state);
 
@@ -26,7 +28,8 @@ void init_game_state(GameState *g_state) {
 
     // --- MEMBER A: Init Stats ---
     p->isAlive = true;
-    p->energy = 100.0f;      // Start with full energy
+    p->search_mode = false;
+    p->energy = 50.0f;      // Start with full energy
     p->max_energy = 100.0f;
     p->gold = 0;             // Start with 0 gold
     p->deplete_rate[0] = 0;  // Rate of energy loss per move
@@ -34,12 +37,13 @@ void init_game_state(GameState *g_state) {
     p->deplete_rate[2] = 0.01f;
     // ----------------------------
 
+    p->total_distance = 0;
     p->x_max = DISPLAY_X;
     p->y_max = DISPLAY_Y;
 
 
-    g_state->t_state.s += "Hello!\nNext line!\nDemo demoo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo!";
-
+//    g_state->t_state.s += "Hello!\nNext line!\nDemo demoo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo demo!";
+    g_state->t_state.s += sf(" You may find something on island %d", map->clue_start);
     g_state->isActive = 2;
     g_state->proximity = 1;
     g_state->last_key = 0;
@@ -48,7 +52,10 @@ void init_game_state(GameState *g_state) {
 
 //changes the elements of the GameState struct as per the player key input
 // Note: We are changing the signature slightly to 'int ch' based on leader's code
-int state_manager(int ch, GameState *g_state, WorldMap *map) {
+int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
+    //GameState *g_state = &(curr->g_state);
+    //Player *player = &(curr->player);
+
     DisplayState *d = &(g_state->d_state);
     PlayerState *p = &(g_state->p_state);
 
@@ -100,11 +107,20 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
             // --- MEMBER A: Energy Deduction ---
             if (moved) {
                 p->energy -= p->deplete_rate[d->mode];
+                p->total_distance += (p->deplete_rate[d->mode] / p->deplete_rate[1]);
                 if (p->energy <= 0) {
                     p->energy = 0;
                     p->isAlive = false;
-                    // In a real game, we would trigger a "Game Over" screen here
+                    
                     g_state->isActive = 0;
+
+                    string *t = &(g_state->t_state.t);
+                    *t = " xxxx---- You Died! ----xxxx\n\n";
+                    *t += " ------| STATS |------\n";
+                    *t += sf(" Total Distance travelled : %.2f\n", g_state->p_state.total_distance);
+
+                    build_text(g_state, map);
+                    return 0;
                 }
             }
             // ---------------------------------
@@ -113,7 +129,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
     }
     else {
         switch (ch) {
-            case 'm':
+/*            case 'm':
             case 'M': {
                         //toggling show_map
                         if(d->mode == 1) {
@@ -124,7 +140,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
                         }
                         break;
                     }                    
-
+*/
                       //MEMBER C ADDITION
             case 'c':
             case 'C': {
@@ -136,6 +152,14 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
                               // In a full implementation, we would cross-reference player coordinates
                               // with the WorldMap island list.
                           }
+                        if(g_state->last_key == 'c') {
+                            g_state->last_key = 0;
+                        }
+                        else{
+                            g_state->last_key = 'c';
+                        }
+
+
                           break;
                       }
                       // -------------------------
@@ -167,6 +191,15 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
                         break;
                       }
 
+            case 'f':
+            case 'F': {
+                        // Toggle seach_mode
+                        if(d->mode == 2) {
+                            g_state->p_state.search_mode = !(g_state->p_state.search_mode);
+                        }
+                        break;
+                    }
+
             case 'e':
             case 'E':
                       //closing the current game session
@@ -186,10 +219,10 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
     if(ch >= '1' && ch <= '9') {
         if(g_state->proximity == 1 && g_state->game_event.size() > 0) {
             while(ch > '1') {
-                g_state->game_event.pop();
+                g_state->game_event.pop_front();
                 ch--;
             }
-            trigger_event(g_state->game_event.front(), map, g_state);
+            trigger_event(g_state->game_event.front(), map, g_state, player);
         }
     }
 
@@ -206,9 +239,9 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
     //Update the graph as per change in player's position
     update_graph(map, (int*)p->pos[d->mode]);
 
-    //Clear the event queue
+    //Clear the event deque
     while(!g_state->game_event.empty()) {
-        g_state->game_event.pop();
+        g_state->game_event.pop_front();
     }
 
     //Search for events nearby player's position
@@ -217,7 +250,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map) {
 
     //---Text related functions---//
     //Update the string containing text related to a key press
-    update_key_string(g_state, map);
+    update_key_string(g_state, map, player);
 
     //Clear the main string buffer
     g_state->t_state.s.clear();

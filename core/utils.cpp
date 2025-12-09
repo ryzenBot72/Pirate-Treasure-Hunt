@@ -51,6 +51,8 @@ void set_raw_input_mode() {
 
     setvbuf(stdout, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y))); //actual size of each box(pixel) is 18 bytes, but added 2 more bytes for safety and for the newline characters at the end of each line
     setvbuf(stderr, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y)));
+
+    printf("\x1b[?25h");    // Hide cursor
 }
 
 
@@ -67,6 +69,8 @@ void reset_input_mode() {
     #endif
 
     setvbuf(stdout, NULL, _IOFBF, 4096);
+
+    printf("\x1b[?25h");    // Show cursor
 }
 
 

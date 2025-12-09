@@ -16,7 +16,7 @@ int main() {
     init_map(&(w1->map));
 
     (w1->game).push_back(GameSession());
-    init_game_session(&(w1->game[0]));
+    init_game_session(&(w1->game[0]), &(w1->map));
 
     main_loop(w1);
 
