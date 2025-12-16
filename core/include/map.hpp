@@ -7,9 +7,9 @@
 
 using namespace std;
 
-#define SEA_OVERVIEW_X 40
+#define SEA_OVERVIEW_X 60
 #define SEA_OVERVIEW_Y 40
-#define ISLAND_X 40
+#define ISLAND_X 60
 #define ISLAND_Y 40
 
 /*

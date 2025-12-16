@@ -49,10 +49,10 @@ void set_raw_input_mode() {
         tcsetattr(STDIN_FILENO, TCSANOW, &newt); // Set the new settings;
     #endif
 
-    setvbuf(stdout, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y))); //actual size of each box(pixel) is 18 bytes, but added 2 more bytes for safety and for the newline characters at the end of each line
-    setvbuf(stderr, NULL, _IOFBF, (40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y)));
+    setvbuf(stdout, NULL, _IOFBF, 40 * (DISPLAY_X * DISPLAY_Y + TEXT_X * TEXT_Y)); //actual size of each box(pixel) is 18 bytes, but added 2 more bytes for safety and for the newline characters at the end of each line.(Doubled this again)
 
-    printf("\x1b[?25h");    // Hide cursor
+    printf("\x1b[?25l");    // Hide cursor
+    printf("\x1b[?7l");     // Disable text wrap
 }
 
 
@@ -71,6 +71,7 @@ void reset_input_mode() {
     setvbuf(stdout, NULL, _IOFBF, 4096);
 
     printf("\x1b[?25h");    // Show cursor
+    printf("\x1b[?7h");     // Enable text wrap
 }
 
 

@@ -1,6 +1,20 @@
 # Pirate Treasure Hunt
-<!-- <br> -->
+
+A terminal-based pirate adventure where you explore seas and islands, collect clues, and hunt for hidden treasure.
+
 <hr>
+
+## Gameplay
+
+- You play as a pirate captain exploring a world made up of seas and islands.
+- Move around the map using the arrow keys.
+- Travel across the sea to discover islands and land on them to explore.
+- On islands, search for hidden clues and items.
+- Collected clues and items are stored in your inventory.
+- Plan routes between islands and track paths while sailing.
+- The goal is to find all the clues and unlock the final treasure.
+
+---
 
 ## How to run:
 
@@ -26,7 +40,7 @@ followed by
 ```
 
 ### **NOTE!**<br>
-- May **not** compile for some devices.
+- C++14 or higher version required (supported by most of the devices).
 - In case the display appears glitched, zoom out the terminal window until all of the content fits at once.
 
 <hr>
@@ -39,9 +53,20 @@ followed by
 |         Move Down |  Down arrow                     |
 |         Move Left |  Left arrow                     |
 |        Move Right |  Right arrow                    |
-|          Interact |  Numbers (0 - 9)                |
+|          Interact |  Numbers (1 - 9)                |
 |Toggle search mode |  f / F (only in Island view)    |
 |             Paths |  p / P (only in Sea view)       |
 |             Clues |  c / C                          |
 |         Inventory |  i / I                          |
 |             Close |  e / E (press twice to exit)    |
+
+<hr>
+
+## Future Additions Planned
+
+- Restore player progress using a save and load system
+- Introduce enemy ships with combat mechanics
+- Add dynamic sea events such as storms and hazards that can cause energy loss
+- Reward victories with bonus energy, coins, and items
+- Introduce basic mini-games (e.g., unscramble the word) to acquire clues
+- Enhance the user interface using the Simple and Fast Multimedia Library (SFML)

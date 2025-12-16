@@ -166,35 +166,53 @@ void init_clues(WorldMap *map) {
         }
     }*/
     srand(time(0));
-//    string t;
+
     Events ev;
     vector<int> arr = {0,1,2,3,4};
-    int id, curr;
-    id = rand() % map->island.size();
-    map->clue_start = id;
+    int curr, prev = -1;
+
     for(size_t i = 0; i < map->island.size(); i++) {
+        
+        curr = rand() % arr.size(); //random index for arr
+        
+        if(i == 0) {
+            map->clue_start = arr[curr];
+        }
+        
         ev.type = 1;
         ev.clueData.id = i;
-        //ev.clueData.riddle = clues_db[i];
+        ev.clueData.isFound = false;
+        ev.clueData.island_id = arr[curr];
         ev.pos[0] = rand() % (ISLAND_X - 9) + 4;
         ev.pos[1] = rand() % (ISLAND_Y - 9) + 4;
-
-//        t = build_clue_text(WorldMap *map, ev.pos);
-
-
-        curr = arr[id];
-        arr.erase(arr.begin() + id);
         
-        id = rand() % ((int)map->island.size() - i);
-        if(id > 0) { id--; }
+        map->island[arr[curr]].initial.events.push_back(ev);
 
-    
-        ev.clueData.riddle = sf("Go to %d", arr[id]);
-        map->island[curr].initial.events.push_back(ev);
+        if(prev != -1) {
+            map->island[prev].initial.events[0].clueData.riddle = sf("Go to %d", arr[curr]);
+        }
+
+        prev = arr[curr];
+
+        arr.erase(arr.begin() + curr);
     }
-    map->clue_end = curr;
-    map->island[curr].initial.events[0].type = 2;
-    map->island[curr].initial.events[0].clueData.riddle = "You unlocked the Treasure!\n";
+    map->clue_end = prev;
+    map->island[prev].initial.events[0].type = 2;
+    map->island[prev].initial.events[0].clueData.riddle = "You unlocked the Treasure!\n";
+}
+
+void init_items(WorldMap *map) {
+    srand(time(0));
+
+    Item it;
+
+    do {
+        it.pos[0] = rand() % (ISLAND_Y - 9) + 4;
+        it.pos[1] = rand() % (ISLAND_Y - 9) + 4;
+    } while(it.pos[1] == map->island[map->clue_start].initial.events[0].pos[1]);
+
+    it.name = "search";
+    map->island[map->clue_start].initial.items.push_back(it);
 }
 
 
@@ -318,6 +336,7 @@ void init_map(WorldMap *map) {
     generate_islands(map->island, 5); // Create Islands
     create_graph(map);                // Member B: Build Graph
     init_clues(map);                  // Member C: Populate Clues
+    init_items(map);
     init_matrix(map);                 // Render setup
     init_map_vector(map);           // Map type pointers
 }
@@ -345,7 +364,21 @@ void build_canvas(WorldMap *map, int id) {
     if(map->island[id].initial.events.size() != 0) {
         j = map->island[id].initial.events[0].pos[0];
         i = map->island[id].initial.events[0].pos[1];
+
+        if(map->island[id].initial.events[0].clueData.isFound == true) {
+            map->island_canvas[0][i][j] = 53;
+        }
+        else {
+            map->island_canvas[0][i][j] = 240;//29 earlier (dark green)
+        }
         map->island_canvas[1][i][j] = 1;
-        map->island_canvas[0][i][j] = 240; //29 earlier (dark green)
+    }
+
+    if(map->island[id].initial.items.size() != 0) {
+        j = map->island[id].initial.items[0].pos[0];
+        i = map->island[id].initial.items[0].pos[1];
+
+        map->island_canvas[0][i][j] = 220;
+        map->island_canvas[1][i][j] = 3;
     }
 }
