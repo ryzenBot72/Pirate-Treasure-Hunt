@@ -70,3 +70,4 @@ followed by
 - Reward victories with bonus energy, coins, and items
 - Introduce basic mini-games (e.g., unscramble the word) to acquire clues
 - Enhance the user interface using the Simple and Fast Multimedia Library (SFML)
+- Add visuals for game ending
