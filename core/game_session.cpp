@@ -28,19 +28,45 @@ void trigger_event(array<int,3> event_info, WorldMap *map, GameState *g_state, P
             }
         }
     }
-    else if(mode == 2 && layer == 1) {
+    else if(mode == 2 && type == 1) {
+        g_state->d_state.mode = 1;
+        g_state->p_state.search_mode = false;
+    }
+    else if(mode == 2 && layer == 1 && map->island[map->curr].initial.events.size() != 0) {
         int i, j;
         vector<Events>& ev = (map->island[map->curr].initial.events);
 
         j = ev[0].pos[0];
         i = ev[0].pos[1];
         if(i == y && j == x) {
-            if(ev[0].type == 2 && player->inventory.collected_clues.size() == 4) {
-                g_state->t_state.r = ev[0].clueData.riddle;
+            if(
+                ev[0].type == 2 && 
+                ((player->inventory.collected_clues.size() == 4 && ev[0].clueData.isFound == false) ||
+                player->inventory.collected_clues.size() == 5)
+            ) {
+                g_state->t_state.r = "\x1b[48;5;250m\x1b[38;5;0m\x1b[5m";
+                g_state->t_state.r += ev[0].clueData.riddle;
+                g_state->t_state.r += "\x1b[0m";
+                map->island_canvas[0][i][j] = 220;
+                map->island_canvas[1][i][j] = 2;
+                
+                map->island_normal[0][i][j] = 220;
+                map->island_normal[1][i][j] = 2;
+                
+                
                 g_state->isActive = 0;
             }
-            else {
+            else if(ev[0].type == 2 && player->inventory.collected_clues.size() < 4) {
+                ev[0].clueData.isFound = true;
                 player->inventory.collected_clues.push_back(ev[0].clueData);
+
+                g_state->t_state.r = " You've found the treasure, but don't have all the keys to open it!\n";
+                
+                map->island_canvas[0][i][j] = 53;
+            }
+            else if(ev[0].type == 1){
+                player->inventory.collected_clues.push_back(ev[0].clueData);
+                ev[0].clueData.isFound = true;
                 g_state->t_state.r = ev[0].clueData.riddle;
                 map->island_canvas[0][i][j] = 220;
                 map->island_canvas[1][i][j] = 2;
@@ -51,20 +77,31 @@ void trigger_event(array<int,3> event_info, WorldMap *map, GameState *g_state, P
             }
         }
     }
-    else if(mode == 2 && layer == 3) {
-        g_state->t_state.r = " Picked Energy Booster!\n Energy++\n\n";
-        
-        map->island_canvas[0][y][x] = color[rand() % 2];
-        map->island_canvas[1][y][x] = 2;
+    else if(mode == 2 && layer == 3){
+        vector<Item>& it = (map->island[map->curr].initial.items);
 
-        map->island_normal[0][y][x] = color[rand() % 2];
-        map->island_normal[1][y][x] = 2;
+        if(it.size() != 0 && it[0].pos[0] == x && it[0].pos[1] == y) {
+            player->inventory.items.push_back(it[0]);
+            it.erase(it.begin() + 0);
 
-        g_state->p_state.energy += 10;
-
-    }
-    else if(mode == 2 && type == 1) {
-        g_state->d_state.mode = 1;
-        g_state->p_state.search_mode = false;
+            g_state->t_state.r = " You've unlocked SEARCH ability!\n Press 'f' to enable.\n";
+            map->island_canvas[0][y][x] = 220;
+            map->island_canvas[1][y][x] = 2;
+        }
+        else {   
+            g_state->t_state.r = " Picked Energy Booster!\n Energy++\n\n";
+            
+            map->island_canvas[0][y][x] = color[rand() % 2];
+            map->island_canvas[1][y][x] = 2;
+            
+            map->island_normal[0][y][x] = color[rand() % 2];
+            map->island_normal[1][y][x] = 2;
+            
+            g_state->p_state.energy += 10;
+            if(g_state->p_state.energy > 100) {
+                g_state->p_state.energy = 100;
+            }
+        }
+            
     }
 }

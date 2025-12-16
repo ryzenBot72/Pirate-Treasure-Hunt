@@ -10,6 +10,7 @@ using namespace std;
 // Defining the structure of a Clue
 typedef struct Clue {
     int id;
+    int island_id;
     string riddle;      // The puzzle text
     string key;    // The answer (optional, if you want input)
     bool isFound;       // Has the player found this yet?
@@ -28,6 +29,7 @@ typedef struct Item {
     string name;
     string description;
     int value; // Gold value or Energy restore amount
+    int pos[2];
 } Item;
 // ---------------------------------
 

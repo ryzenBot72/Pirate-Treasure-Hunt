@@ -23,10 +23,18 @@ void update_key_string(GameState *g_state, WorldMap *map, Player *player) {
                 vector<Clue>& clues = (player->inventory.collected_clues);
 
                 *t += "\n **** CLUES ****\n\n";
-                *t +=sf(" Start -> You may find something on island %d\n", map->clue_start);
+                *t += "     From | \n";
+                *t += "-------------------------------------------------\n";
+                *t += sf("    Start | You may find something on island %d\n", map->clue_start);
                 for(size_t i = 0; i < clues.size(); i++) {
-                    *t += sf(" %5d -> ", clues[i].id);
-                    *t += clues[i].riddle;
+                    *t += sf(" Island %d | ", clues[i].island_id);
+                    
+                    if(clues[i].isFound == true) {
+                        *t += "You've found the treasure, but don't have all the keys to open it!";
+                    }
+                    else {
+                        *t += clues[i].riddle;
+                    }
                     *t += "\n";
                 }
                 break;
@@ -66,7 +74,8 @@ void update_key_string(GameState *g_state, WorldMap *map, Player *player) {
 
 void build_text(GameState *g_state, WorldMap *map) {
     string *s = &(g_state->t_state.s);
-    array<int,3> event_info = g_state->game_event.front();
+
+    array<int,3> event_info; 
 
     s->clear();
 
@@ -124,6 +133,7 @@ void build_text(GameState *g_state, WorldMap *map) {
     //Event detection text
     if(g_state->game_event.size() != 0) {
         deque<array<int,3>> temp = g_state->game_event;
+        event_info = g_state->game_event.front();
 
         if(g_state->d_state.mode == 1) {
             *s += "\n Do you want to explore?\n";

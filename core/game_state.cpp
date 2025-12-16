@@ -53,8 +53,6 @@ void init_game_state(GameState *g_state, WorldMap *map) {
 //changes the elements of the GameState struct as per the player key input
 // Note: We are changing the signature slightly to 'int ch' based on leader's code
 int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
-    //GameState *g_state = &(curr->g_state);
-    //Player *player = &(curr->player);
 
     DisplayState *d = &(g_state->d_state);
     PlayerState *p = &(g_state->p_state);
@@ -115,9 +113,12 @@ int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
                     g_state->isActive = 0;
 
                     string *t = &(g_state->t_state.t);
-                    *t = " xxxx---- You Died! ----xxxx\n\n";
+                    
+                    *t = "\x1b[48;5;234m";
+                    *t += " xxxx---- You Died! ----xxxx\n\n";
                     *t += " ------| STATS |------\n";
-                    *t += sf(" Total Distance travelled : %.2f\n", g_state->p_state.total_distance);
+                    *t += sf(" Total Distance travelled : %.2f\n\n", g_state->p_state.total_distance);
+                    *t += "\x1b[0m";
 
                     build_text(g_state, map);
                     return 0;
@@ -194,7 +195,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
             case 'f':
             case 'F': {
                         // Toggle seach_mode
-                        if(d->mode == 2) {
+                        if(d->mode == 2 && player->inventory.items.size() == 1) {
                             g_state->p_state.search_mode = !(g_state->p_state.search_mode);
                         }
                         break;
@@ -217,12 +218,8 @@ int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
 
     //Trigger the event selected by the player
     if(ch >= '1' && ch <= '9') {
-        if(g_state->proximity == 1 && g_state->game_event.size() > 0) {
-            while(ch > '1') {
-                g_state->game_event.pop_front();
-                ch--;
-            }
-            trigger_event(g_state->game_event.front(), map, g_state, player);
+        if(g_state->proximity == 1 && (int)g_state->game_event.size() > (ch - '1')) {
+           trigger_event(g_state->game_event[(int)(ch - '1')], map, g_state, player);
         }
     }
 
@@ -240,9 +237,7 @@ int state_manager(int ch, GameState *g_state, WorldMap *map, Player *player) {
     update_graph(map, (int*)p->pos[d->mode]);
 
     //Clear the event deque
-    while(!g_state->game_event.empty()) {
-        g_state->game_event.pop_front();
-    }
+    g_state->game_event.clear();
 
     //Search for events nearby player's position
     scan_player_area(map, g_state);
