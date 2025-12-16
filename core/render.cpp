@@ -1,6 +1,5 @@
 #include "render.hpp"
 #include <iostream>
-#include <windows.h>
 
 //print the matrix representing the game display
 void printMatrix(int rows, int cols, const vector<vector<vector<int>>>& matrix, GameState *g_state, WorldMap *map) {
